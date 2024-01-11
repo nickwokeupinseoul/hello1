@@ -1,7 +1,8 @@
 pipeline {
     agent {
         docker {
-              image '158.160.15.30:8123/jenkinswork/jenkins-agent-2'
+              image '158.160.15.30:8123/jenkinswork:jenkins-agent-2'
+              args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
@@ -17,6 +18,11 @@ pipeline {
             }
         }
         stage('make docker image') {
+            
+            environment {
+                HOME = "${env.WORKSPACE}"
+            }
+            
             steps {
                 sh 'docker build --tag=webappindocker .'
                 sh '''docker tag webappindocker 158.160.15.30:8123/jenkinswork/webappindocker:2-staging && docker push 158.160.15.30:8123/jenkinswork/webappindocker:2-staging'''
